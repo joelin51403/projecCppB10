@@ -121,7 +121,7 @@ int main(){
                 if((rho > 165 - rhoR) && (rho < 165 + rhoR) && (theta > 0.95 - thetaR) && (theta < 0.95 + thetaR))
                 {
                     Point pt1, pt2;
-                    double m;
+                    
                     double a = cos(theta), b = sin(theta);
                     double x0 = a*rho, y0 = b*rho;
                     pt1.x = cvRound(x0 + 1000*(-b))+550;
