@@ -28,11 +28,15 @@ int main(){
     string v3 = "/Users/joelin/Documents/檢舉/2017_0525_095823.MP4";
     string v4 = "/Users/joelin/Documents/檢舉/2017_0525_101518.MP4";
     
-    VideoCapture video(v2);
+    VideoCapture video(v1);
     //VideoCapture video("/Users/joelin/Documents/testcv/2017_0522_095851.MP4");
     Size videoSize = Size((int)video.get(CV_CAP_PROP_FRAME_WIDTH),(int)video.get(CV_CAP_PROP_FRAME_HEIGHT));
+    
     namedWindow("video demo", WINDOW_NORMAL);
+
+
     int key;
+    int ifStopLineL = 0, ifStopLineR = 0;
     Mat src;
     Mat hsv;
     Mat mask_yellow;
@@ -57,7 +61,7 @@ int main(){
     CvRect Rect1;
     Rect1=cvRect(550,750,720,130);
     float rho, theta;
-    float rhoR = 7,thetaR  = 0.4;
+    float rhoR = 7,thetaR  = 0.2;
     
     
     //vector<Vec4i> lines;
@@ -132,7 +136,11 @@ int main(){
                     
                     
                     pt2.x = innerD(2.0, 3.3, pt1.x, pt2.x);
-                    pt2.y = innerD(2.0, 3.3, pt1.y, pt2.y)-4;
+                    pt2.y = innerD(2.0, 3.3, pt1.y, pt2.y);
+                    
+                    pt1.x = innerD(0.95, 2.3, pt1.x, pt2.x);
+                    pt1.y = innerD(0.95, 2.3, pt1.y, pt2.y);
+                    
                     // if(pt2.x < 350){
                     line( src, pt1, pt2, Scalar(0,0,255), 3, CV_AA);
                     ifLeftLine = 1;
@@ -143,18 +151,24 @@ int main(){
                     pt2L.y = pt2.y;
                     
                     
-                    
+                    ifStopLineL = 0;
+
                     //}
                     
                 }
                 
             }
-            
-            if(ifLeftLine == 0)
-            {
-                line( src, pt1L, pt2L, Scalar(0,0,255), 3, CV_AA);
-                
+            if( ifStopLineL < 10){
+                if(ifLeftLine == 0)
+                {
+                    line( src, pt1L, pt2L, Scalar(0,0,255), 3, CV_AA);
+                    ifStopLineL++;
+                    cout<< "draw"<<endl;
+                    
+                }
             }
+          
+            cout<< ifStopLineL<< endl;
             
             for( size_t i = 0; i < lines.size()&& ifRightLine == 0; i++ )
             {
@@ -174,11 +188,16 @@ int main(){
                     pt2.y = cvRound(y0 - 1000*(a))+750;
                     
                     pt1.x = innerD(1.0, 2.0, pt1.x, pt2.x);
-                    pt1.y = innerD(1.0, 2.0, pt1.y, pt2.y)-4;
+                    pt1.y = innerD(1.0, 2.0, pt1.y, pt2.y);
+                    
+                    pt2.x = innerD(1.0, 2.0, pt1.x, pt2.x);
+                    pt2.y = innerD(1.0, 2.0, pt1.y, pt2.y);
+                    
                     if(pt1.y > 700){
                         line( src, pt1, pt2, Scalar(0,0,255), 3, CV_AA);
                         ifRightLine = 1;
-                        
+                        ifStopLineR = 0;
+
                         pt1R.x = pt1.x;
                         pt1R.y = pt1.y;
                         pt2R.x = pt2.x;
@@ -191,10 +210,12 @@ int main(){
                 }
                 
             }
-            if(ifRightLine == 0)
-            {
-                line( src, pt1R, pt2R, Scalar(0,0,255), 3, CV_AA);
-                
+            if( ifStopLineR < 10){
+                if(ifRightLine == 0)
+                {
+                    line( src, pt1R, pt2R, Scalar(0,0,255), 3, CV_AA);
+                    ifStopLineR++;
+                }
             }
             //cout<< endl<<l[3];
             
@@ -212,10 +233,10 @@ int main(){
         //imshow("mask_white demo", mask_white);
         //imshow("gray demo", gray_hsv);
         //imshow("dst", dst);
-        //imshow("mask_yw_image", gauss_gray);
-        
-        
-        imshow("video demo2", src);
+        imshow("mask_yw_image", gauss_gray);
+        resizeWindow("video demo", src.cols , src.rows / 2);
+
+        imshow("video demo", src);
         waitKey(1);
         
         
