@@ -77,6 +77,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C70A4B8C1FC1AC6000615648 /* car.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = car.hpp; sourceTree = "<group>"; };
+		C70A4B8D1FC1AC6000615648 /* DetectCar.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DetectCar.hpp; sourceTree = "<group>"; };
+		C70A4B8E1FC1AC6000615648 /* global_variable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = global_variable.h; sourceTree = "<group>"; };
+		C70A4B8F1FC1AC6000615648 /* laneDetect.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = laneDetect.hpp; sourceTree = "<group>"; };
 		C7A3135C1EE44D9600490A98 /* projecCppB10 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = projecCppB10; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7A3135F1EE44D9600490A98 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		C7C64EE91EE4551200B48BEB /* libGLEW.2.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libGLEW.2.0.0.dylib; sourceTree = "<group>"; };
@@ -133,6 +137,7 @@
 		C7C64F1C1EE4551200B48BEB /* libopencv_videostab.3.2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libopencv_videostab.3.2.0.dylib; sourceTree = "<group>"; };
 		C7C64F1D1EE4551200B48BEB /* libopencv_videostab.3.2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libopencv_videostab.3.2.0.dylib; sourceTree = "<group>"; };
 		C7C64F1E1EE4551200B48BEB /* libopencv_videostab.3.2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libopencv_videostab.3.2.0.dylib; sourceTree = "<group>"; };
+		C7D2247B1F77B97000922A84 /* laneClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = laneClass.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -203,6 +208,7 @@
 		C7A313531EE44D9600490A98 = {
 			isa = PBXGroup;
 			children = (
+				C7D2247B1F77B97000922A84 /* laneClass.h */,
 				C7C64F551EE4556F00B48BEB /* dylib */,
 				C7A3135E1EE44D9600490A98 /* projecCppB10 */,
 				C7A3135D1EE44D9600490A98 /* Products */,
@@ -220,6 +226,10 @@
 		C7A3135E1EE44D9600490A98 /* projecCppB10 */ = {
 			isa = PBXGroup;
 			children = (
+				C70A4B8C1FC1AC6000615648 /* car.hpp */,
+				C70A4B8D1FC1AC6000615648 /* DetectCar.hpp */,
+				C70A4B8E1FC1AC6000615648 /* global_variable.h */,
+				C70A4B8F1FC1AC6000615648 /* laneDetect.hpp */,
 				C7A3135F1EE44D9600490A98 /* main.cpp */,
 			);
 			path = projecCppB10;
