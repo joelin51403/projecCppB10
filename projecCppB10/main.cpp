@@ -63,5 +63,6 @@ int main(int argc, char *argv[])
         
         //cout<< "x "<< distance[0].x<<endl;
     }
+    cout<<"test git";
     return 0;
 }
