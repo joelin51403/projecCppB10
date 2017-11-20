@@ -67,6 +67,7 @@ public:
     }
     
     Point r, l;
+    
     double meterCar, temp, tempY;
     char meterCarString[20];
     Point distance[5];
