@@ -15,6 +15,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+    int i;
     string v1 = "/Volumes/Sony_64GU/原始影片/65測試2.mp4";//路徑
     string v2 = "/Volumes/Joe_大usb16G/IMG_0135.MOV";//路徑
     VideoCapture video(v1);
@@ -30,6 +31,7 @@ int main(int argc, char *argv[])
     //writer.open("/Users/joelin/Documents/專題B10/vedio/VideoTest.avi", CV_FOURCC('M', 'J', 'P', 'G'), 30, videoSize);
     writer.open("/Users/joelin/Documents/專題B10/vedio/VideoTest1122.avi", CV_FOURCC('M', 'J', 'P', 'G'), 30, videoSize);
     cout<<"START !!"<<endl;
+    Car car[10];
     while(true){
         currentFram++;
         video >> src;
@@ -37,12 +39,25 @@ int main(int argc, char *argv[])
             break;
         }
         resize(src, src, Size(1920,1080));
+        
         detectCar *detectCar1 = new detectCar(src, recordnum);
+        
+        for(i = 0; i < 10; i++){
+            if(carDetectStruct[i].flag< 7){
+                car[i].carSetPoint(carDetectStruct[i].l, carDetectStruct[i].r);
+                Point showL, showR;
+                
+                //line(src, car[i].l, car[i].r, Scalar(0,0,255));
+                cout<<car[i].l<<" "<<car[i].r<<endl;
+            }
+        }
+        
         writer.write(src);
         resize(src, src, Size(src.cols/2, src.rows/2));
         imshow("show", src);
         waitKey(1);
-        delete detectCar1;
+        
+        //計算進度條
         if(currentFram > framCountRtio ){
             if(fram10%10 == 0){ //10倍
                 cout<<fram10<<"%";

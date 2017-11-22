@@ -30,5 +30,9 @@ CascadeClassifier car_cascade;
 
 int roiCar[4] = {0,650,1920,300};
 int roiLane[4] = {300,130,1000,169};
-
+struct carStruct{
+    int flag = 99;
+    Point r, l;
+};
+carStruct carDetectStruct[10];
 #endif /* global_variable_h */

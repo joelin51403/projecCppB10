@@ -14,6 +14,9 @@
 using namespace cv;
 class Car{
 public:
+    Car(){
+        
+    }
     Car(Point L, Point R){
         r.x = R.x;
         r.y = R.y;
@@ -22,6 +25,15 @@ public:
         temp = double(r.y);
         distanceCar();
 
+    }
+    void carSetPoint(Point L, Point R){
+        r.x = R.x;
+        r.y = R.y;
+        l.x = L.x;
+        l.y = L.y;
+        temp = double(r.y);
+        distanceCar();
+        
     }
     void carRoiTransLane(){
         r.x -= 300;
@@ -69,7 +81,7 @@ public:
         }
         
     }
-    
+    int flag = 5;
     Point r, l;
     
     double meterCar, temp, tempY;

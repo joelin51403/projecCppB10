@@ -10,6 +10,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include <time.h>
 #include <iostream>
+#include <math.h>
 #include <stdio.h>
 using namespace std;
 using namespace cv;
@@ -26,6 +27,17 @@ public:
         CvRect ROI = CvRect(roiCar[0],roiCar[1],roiCar[2],roiCar[3]);
         frameROI = frameROI(ROI);
         DetectAndDisplay( frameROI, recordnum );
+        for(int i = 0; i < 10; i++){
+            carDetectStruct[i].flag++;
+            if (carDetectStruct[i].flag >6 && carDetectStruct[i].flag != 99) {
+                carDetectStruct[i].flag = 99;
+                carDetectStruct[i].r.x = 0;
+                carDetectStruct[i].r.y = 0;
+                carDetectStruct[i].l.x = 0;
+                carDetectStruct[i].l.y = 0;
+            }
+        }
+        
     }
     
     void DetectAndDisplay( Mat frame, int recordnum )
@@ -323,43 +335,49 @@ public:
     
     void DrawCarLine(Mat src, Mat car_frame, int x1, int y1, int x2, int y2, int initial_x, int initial_y)
     {
-        
+        int i;
         Point pt1(x1, y1);
         Point pt2(x1, y2);
         Point pt3(x2, y1);
         Point pt4(x2, y2);
-
-//        line(car_frame, pt1, pt2, Scalar(0,0,0));
-//        line(car_frame, pt3, pt4, Scalar(0,0,0));
-//        line(car_frame, pt2, pt4, Scalar(0,0,0));
-        line(car_frame, pt2, pt4,  Scalar(0,66,255), 3, CV_AA);
         
-        if(crossLaneR >3 || crossLaneL >3){
-            pt2.y += 17;
-            putText(car_frame,"change" , pt2  ,  FONT_HERSHEY_COMPLEX , 1,Scalar(0,255,0));//show文字
-            pt2.y -= 17;
-
-        }
-
-
+        line(car_frame, pt1, pt2, Scalar(0,0,255));
+        line(car_frame, pt3, pt4, Scalar(0,0,255));
+        line(car_frame, pt2, pt4, Scalar(0,0,255), 3, CV_AA);
+        
         pt2.x += initial_x; pt2.y += 650 + initial_y; pt4.x += initial_x; pt4.y += 650 + initial_y;
         
-        Car *car1 = new Car(pt2,pt4);
+        bool match = false;
+        for(i = 0; i < 10; i++){
+            if((abs(carDetectStruct[i].l.x - pt2.x) < 20 && abs(carDetectStruct[i].l.y - pt2.y) < 20) && carDetectStruct[i].flag != 99){
+                carDetectStruct[i].l.x = pt2.x;
+                carDetectStruct[i].l.y = pt2.y;
+                carDetectStruct[i].r.x = pt4.x;
+                carDetectStruct[i].r.y = pt4.y;
+                carDetectStruct[i].flag = 0;
+                match = true;
+                break;
+            }
+        }
+        if(match == false){
+            for(i = 0; i < 10; i++){
+                if(carDetectStruct[i].flag == 99){
+                    carDetectStruct[i].l.x = pt2.x;
+                    carDetectStruct[i].l.y = pt2.y;
+                    carDetectStruct[i].r.x = pt4.x;
+                    carDetectStruct[i].r.y = pt4.y;
+                    carDetectStruct[i].flag = 0;
+                    break;
+                }
+            }
+        }
         
-        pt2.x -= initial_x; pt2.y -= 650 + initial_y; pt4.x -= initial_x; pt4.y -= 650 + initial_y;
 
-        putText(car_frame, car1->meterCarString , (pt2 + pt4)/2,  FONT_HERSHEY_COMPLEX , 1,Scalar(0,255,0));//show文字
-        //car1->carRoiTransLane();
-        Lane *detect = new Lane(src,*car1);
-//        line(src, car1->distance[0], car1->distanceR[0],  Scalar(0,0,0));
-//        line(src, car1->distance[1], car1->distanceR[1],  Scalar(0,0,0));
-//        line(src, car1->distance[2], car1->distanceR[2],  Scalar(0,0,0));
-//        line(src, car1->distance[3], car1->distanceR[3],  Scalar(0,0,0));
         
-
-        delete detect;
-        delete car1;
-
+        
+        
+        
+        
     }
     
     void DrawLightLine(Mat car_frame, int x1, int x2, int x3, int x4, int y1, int y2){
