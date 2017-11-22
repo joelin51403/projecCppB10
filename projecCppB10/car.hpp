@@ -10,6 +10,7 @@
 #define car_hpp
 #include <cstdlib>
 #include <stdio.h>
+#include <string>
 using namespace cv;
 class Car{
 public:
@@ -52,18 +53,21 @@ public:
             double b = (distanceNum[0] - temp / distanceNum[0] - distanceNum[1]) / 10.0;
                                   
             meterCar = 10.0 + ((distanceNum[0] - temp) / (distanceNum[0] - distanceNum[1])) * 10.0;
+            sprintf(meterCarString, "%.1f", meterCar);
         }
         else if(temp <= distance[1].y && temp > distance[2].y){
             double a = ((distanceNum[1] - temp )/ (distanceNum[1] - distanceNum[2]));
-            meterCar = 20.0 + (((distanceNum[1] -temp) / (distanceNum[1] - distanceNum[2])) * 10.0);
+            meterCar = 15.0 + (((distanceNum[1] -temp) / (distanceNum[1] - distanceNum[2])) * 10.0);
+            sprintf(meterCarString, "%.1f", meterCar);
         }
         else if(temp <= distance[2].y && temp > distance[3].y){
-            meterCar = 30.0 + ((distanceNum[2] - temp) / (distanceNum[2] - distanceNum[3]) * 10.0);
+            meterCar = 20.0 + ((distanceNum[2] - temp) / (distanceNum[2] - distanceNum[3]) * 10.0);
+            sprintf(meterCarString, "%.1f", meterCar);
         }
         else{
-            meterCar = 100.0;
+            strcpy(meterCarString, "far");
         }
-        sprintf(meterCarString, "%f", meterCar);
+        
     }
     
     Point r, l;

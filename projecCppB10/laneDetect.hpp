@@ -113,7 +113,7 @@ public:
 
 
         //car.carRoiTransLaneRe();
-        imshow("1123", dst);
+        //imshow("1123", dst);
 
         
     }
@@ -199,7 +199,7 @@ public:
         }
 #endif
         
-        imshow("1123", dst);
+        //imshow("1123", dst);
     
     
     }

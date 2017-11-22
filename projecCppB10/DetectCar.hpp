@@ -157,7 +157,7 @@ public:
         
         // 合併兩個不同區間的紅色
         Red_merge = Red1 + Red2;
-        imshow("Red", Red_merge);
+//        imshow("Red", Red_merge);
         
         // 設定範圍，偵測車燈
         int cnt_red_row[500] = {} ,cnt_red_left[500] = {}, cnt_red_right[500] = {};
@@ -272,7 +272,7 @@ public:
         inRange(hsv, Scalar(156,50,200), Scalar(180,255,255), Brakelight_2);
         
         Brakelight_merge = Brakelight_1 + Brakelight_2;
-        imshow("Brakelight", Brakelight_merge);
+//        imshow("Brakelight", Brakelight_merge);
         
         int count_left_red = 0;
         for(i=red_x1; i<=red_x2; i++){
@@ -308,7 +308,7 @@ public:
     {
         Mat Yellow;
         inRange(hsv, Scalar(18,50,50), Scalar(38,255,255), Yellow);
-        imshow("Yellow", Yellow);
+//        imshow("Yellow", Yellow);
         int cnt = 0;
         for ( int y=y1*0.8; y<=y2*1.2; y++ ){
             for ( int x=x1*0.8; x<=x2*1.2; x++ ){
@@ -319,7 +319,7 @@ public:
         }
         Mat Yellow_Light;
         inRange(hsv, Scalar(20,50,220), Scalar(34,255,255), Yellow_Light);
-        imshow("Yellow_Light", Yellow_Light);
+//        imshow("Yellow_Light", Yellow_Light);
         
         int count = 0;
         for ( int y=y1*0.8; y<=y2*1.2; y++ ){
@@ -351,7 +351,10 @@ public:
         line(car_frame, pt2, pt4,  Scalar(0,66,255), 3, CV_AA);
         
         if(crossLaneR >3 || crossLaneL >3){
-            putText(car_frame,"trans" , pt2  ,  FONT_HERSHEY_COMPLEX , 1,Scalar(0,255,0));//show文字
+            pt2.y += 17;
+            putText(car_frame,"change" , pt2  ,  FONT_HERSHEY_COMPLEX , 1,Scalar(0,255,0));//show文字
+            pt2.y -= 17;
+
         }
 
 
