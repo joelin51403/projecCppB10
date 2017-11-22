@@ -17,16 +17,6 @@ using namespace cv;
 
 static Point lastPtL1,lastPtL2,lastPtR1, lastPtR2;
 static int ifLeftLineNum, ifRightLineNum;
-int TH1 = 180;
-int real_x[2];
-
-float refBlue=0;
-float refGreen=0;
-float refRed=255;
-
-float targetBlue=0;
-float targetGreen=255;
-float targetRed=255;
 
 int orignal[99]={};
 int yellow[99]={};
@@ -40,10 +30,5 @@ CascadeClassifier car_cascade;
 
 int roiCar[4] = {0,650,1920,300};
 int roiLane[4] = {300,130,1000,169};
-
-
-
-
-
 
 #endif /* global_variable_h */

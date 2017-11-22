@@ -28,21 +28,6 @@ public:
         DetectAndDisplay( frameROI, recordnum );
     }
     
-    int detectyellow( Mat frame )
-    {
-        int yellow=0 ;
-        for ( int y=0; y<frame.rows; y++ ){
-            for ( int x=0; x<frame.cols; x++ ){
-                if( frame.at<Vec3b>(y,x)[2] == 255 && frame.at<Vec3b>(y,x)[1] == 255 ){
-                    yellow++ ;
-                }
-            }
-            
-        }//黃色
-        return yellow ;
-        
-    }
-    
     void DetectAndDisplay( Mat frame, int recordnum )
     {
         car_cascade.load(car_cascade_name);
@@ -67,8 +52,6 @@ public:
         for( int i = 0; i < car.size(); i++ )
         {
             int x1 = car[i].x, y1 = car[i].y, x2 = car[i].x + car[i].width, y2 = car[i].y + car[i].height;
-            real_x[0] = car[i].x;
-            real_x[1] = car[i].x + car[i].width;
     
             x1 -= car[i].width * 0.3;
             if(x1 < 0)
@@ -89,6 +72,7 @@ public:
     void Detect_Boundary(Mat src, Mat car, int x, int Car_num, int initial_x, int initial_y)
     {
         int cnt_black[500] = {}, i, j, max = 0, min_point = 0;
+        int left_boundary = 0, right_boundary = car.cols;
         Mat Black, hsv;
         
         // 將三原色轉成hsv
@@ -121,7 +105,7 @@ public:
         for(i=0; i<car.cols; ++i){
             if (left_flag == 0 && Black.at<uchar>(min_point - 7, i) == 255){
                 left_flag++;
-                real_x[0] = i;
+                left_boundary = i;
             }
             else if(left_flag != 0 && Black.at<uchar>(min_point - 7, i) == 255){
                 left_flag++;
@@ -137,7 +121,7 @@ public:
         for(i=car.cols-1; i>0; --i){
             if (right_flag == 0 && Black.at<uchar>(min_point - 7, i) == 255){
                 right_flag++;
-                real_x[1] = i;
+                right_boundary = i;
             }
             else if(right_flag != 0 && Black.at<uchar>(min_point - 7, i) == 255){
                 right_flag++;
@@ -152,8 +136,8 @@ public:
         Mat Red1, Red2, Red_merge;
         
         // 紅色的h為156~10，因為程式限制所以要分兩個偵測並二值化，再合併
-        inRange(hsv, Scalar(0,50,90), Scalar(10,255,255), Red1);
-        inRange(hsv, Scalar(156,50,90), Scalar(180,255,255), Red2);
+        inRange(hsv, Scalar(0,110,110), Scalar(10,255,255), Red1);
+        inRange(hsv, Scalar(156,100,110), Scalar(180,255,255), Red2);
         
         // 合併兩個不同區間的紅色
         Red_merge = Red1 + Red2;
@@ -161,12 +145,12 @@ public:
         
         // 設定範圍，偵測車燈
         int cnt_red_row[500] = {} ,cnt_red_left[500] = {}, cnt_red_right[500] = {};
-        int left = real_x[0] - car.cols / 20 > 0 ? real_x[0] - car.cols / 20 : 0;
-        int right = real_x[1] + car.cols / 20 < car.cols - 1 ? real_x[1] + car.cols / 20 : car.cols;
+        int left = left_boundary - car.cols / 20 > 0 ? left_boundary - car.cols / 20 : 0;
+        int right = right_boundary + car.cols / 20 < car.cols - 1 ? right_boundary + car.cols / 20 : car.cols;
         int up = min_point * 0.25, down = min_point * 0.7;
         
         // 計算左邊車燈紅色像素個數
-        for(i=left; i<=real_x[0]+(real_x[1]-real_x[0])*0.25; i++){
+        for(i=left; i<=left_boundary+(right_boundary-left_boundary)*0.25; i++){
             for(j=up; j<down; j++){
                 if(Red_merge.at<uchar>(j,i) == 255){
                     cnt_red_left[i]++;
@@ -176,7 +160,7 @@ public:
         }
         
         // 計算右邊車燈紅色像素個數
-        for(i=real_x[0]+(real_x[1]-real_x[0])*0.75; i<=right; i++){
+        for(i=left_boundary+(right_boundary-left_boundary)*0.75; i<=right; i++){
             for(j=up; j<down; j++){
                 if(Red_merge.at<uchar>(j,i) == 255){
                     cnt_red_right[i]++;
@@ -186,7 +170,7 @@ public:
         }
         
         // 假定初始車燈位置
-        int red_x1 = real_x[0], red_x2 = real_x[0], red_x3 = real_x[1], red_x4 = real_x[1], red_y1 = min_point * 0.25, red_y2 = min_point * 0.7;
+        int red_x1 = left_boundary, red_x2 = left_boundary, red_x3 = right_boundary, red_x4 = right_boundary, red_y1 = min_point * 0.25, red_y2 = min_point * 0.7;
         
         // 判斷車燈上邊界
         max = 0;
@@ -212,7 +196,7 @@ public:
         
         // 判斷左車燈左邊界
         max = 0;
-        for(i=left; i<=real_x[0]+(real_x[1]-real_x[0])*0.25; i++){
+        for(i=left; i<=left_boundary+(right_boundary-left_boundary)*0.25; i++){
             if(cnt_red_left[i] - max * 4 > 0){
                 max = cnt_red_left[i];
                 red_x1 = i;
@@ -223,7 +207,7 @@ public:
         
         // 判斷左車燈右邊界
         max = 0;
-        for(i=real_x[0]+(real_x[1]-real_x[0])*0.25; i>left; i--){
+        for(i=left_boundary+(right_boundary-left_boundary)*0.25; i>left; i--){
             if(cnt_red_left[i] - max * 4 > 0){
                 max = cnt_red_left[i];
                 red_x2 = i;
@@ -234,7 +218,7 @@ public:
         
         // 判斷右車燈左邊界
         max = 0;
-        for(i=real_x[0]+(real_x[1]-real_x[0])*0.75; i<right; i++){
+        for(i=left_boundary+(right_boundary-left_boundary)*0.75; i<right; i++){
             if(cnt_red_right[i] - max * 4 > 0){
                 max = cnt_red_right[i];
                 red_x3 = i;
@@ -245,7 +229,7 @@ public:
         
         // 判斷右車燈右邊界
         max = 0;
-        for(i=right; i>real_x[0]+(real_x[1]-real_x[0])*0.75; i--){
+        for(i=right; i>left_boundary+(right_boundary-left_boundary)*0.75; i--){
             if(cnt_red_right[i] - max * 4 > 0){
                 max = cnt_red_right[i];
                 red_x4 = i;
@@ -254,13 +238,13 @@ public:
                 max = cnt_red_right[i];
         }
         
-        int real_width = abs(real_x[1] - real_x[0]) > 0 ? abs(real_x[1] - real_x[0]) : 1;
+        int real_width = abs(right_boundary - left_boundary) > 0 ? abs(right_boundary - left_boundary) : 1;
         int red_width = abs(red_x4 - red_x1) > 0 ? abs(red_x4 - red_x1) : 1;
         
         // 調整車子實際寬度
         if( real_width - red_width > 0 ){
-            real_x[0] = red_x1 - 1;
-            real_x[1] = red_x4 + 1;
+            left_boundary = red_x1 - 1;
+            right_boundary = red_x4 + 1;
         }
         
         // 偵測黃色
@@ -301,7 +285,7 @@ public:
         DrawLightLine(car, red_x1, red_x2, red_x3, red_x4, red_y1, red_y2);
         
         // 將車子的邊線畫出
-        DrawCarLine(src, car, real_x[0], min_point * 0.4, real_x[1], min_point, initial_x, initial_y);
+        DrawCarLine(src, car, left_boundary, min_point * 0.4, right_boundary, min_point, initial_x, initial_y);
     }
     
     void Detect_Yellow( Mat car, Mat hsv, int x1, int x2, int y1, int y2, int Car_Num )
