@@ -43,16 +43,24 @@ int main(int argc, char *argv[])
         detectCar *detectCar1 = new detectCar(src, recordnum);
         
         for(i = 0; i < 10; i++){
-            if(carDetectStruct[i].flag< 7){
+            //if(carDetectStruct[i].flag){
                 car[i].carSetPoint(carDetectStruct[i].l, carDetectStruct[i].r);
-                Point showL, showR;
                 
                 //line(src, car[i].l, car[i].r, Scalar(0,0,255));
-                cout<<car[i].l<<" "<<car[i].r<<endl;
-            }
+//                cout<<car[i].l<<" "<<car[i].r<<endl;
+                
+            //}
         }
         
-        writer.write(src);
+        for(i = 0; i < 10; i++){
+            car[i].carSetValue(carDetectStruct[i].turn_signal_flag);
+        }
+        //imshow("show2", src);
+
+        Lane *detect = new Lane(src,car);
+        //writer.write(src);
+       // imshow("show2", src);
+
         resize(src, src, Size(src.cols/2, src.rows/2));
         imshow("show", src);
         waitKey(1);

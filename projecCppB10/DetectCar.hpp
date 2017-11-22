@@ -28,9 +28,13 @@ public:
         frameROI = frameROI(ROI);
         DetectAndDisplay( frameROI, recordnum );
         for(int i = 0; i < 10; i++){
-            carDetectStruct[i].flag++;
+            if(carDetectStruct[i].flag != 99){
+                carDetectStruct[i].flag++;
+                carDetectStruct[i].turn_signal_flag++;
+            }
             if (carDetectStruct[i].flag >6 && carDetectStruct[i].flag != 99) {
                 carDetectStruct[i].flag = 99;
+                carDetectStruct[i].turn_signal_flag = 99;
                 carDetectStruct[i].r.x = 0;
                 carDetectStruct[i].r.y = 0;
                 carDetectStruct[i].l.x = 0;
@@ -148,8 +152,8 @@ public:
         Mat Red1, Red2, Red_merge;
         
         // 紅色的h為156~10，因為程式限制所以要分兩個偵測並二值化，再合併
-        inRange(hsv, Scalar(0,110,110), Scalar(10,255,255), Red1);
-        inRange(hsv, Scalar(156,100,110), Scalar(180,255,255), Red2);
+        inRange(hsv, Scalar(0,100,100), Scalar(10,255,255), Red1);
+        inRange(hsv, Scalar(156,100,100), Scalar(180,255,255), Red2);
         
         // 合併兩個不同區間的紅色
         Red_merge = Red1 + Red2;
@@ -259,28 +263,42 @@ public:
             right_boundary = red_x4 + 1;
         }
         
-        // 偵測黃色
-        Detect_Yellow(car, hsv, red_x1, red_x4, red_y1, red_y2, Car_num);
         
-        // 偵測煞車燈
+        
+        
+        // 將車燈的邊線畫出
+        DrawLightLine(car, red_x1, red_x2, red_x3, red_x4, red_y1, red_y2);
+        
+        // 將車子的邊線畫出
+        DrawCarLine(src, car, left_boundary, min_point * 0.4, right_boundary, min_point, initial_x, initial_y);
+        
+        
+        Brake_light(car, hsv, red_x1, red_x2, red_x3, red_x4, red_y1, red_y2);
+        
+    }
+    
+    // 偵測煞車燈
+    void Brake_light( Mat car, Mat hsv, int x1, int x2, int x3, int x4, int y1, int y2)
+    {
         Mat Brakelight_1, Brakelight_2, Brakelight_merge;
+        int i, j;
         inRange(hsv, Scalar(0,50,200), Scalar(10,255,255), Brakelight_1);
         inRange(hsv, Scalar(156,50,200), Scalar(180,255,255), Brakelight_2);
         
         Brakelight_merge = Brakelight_1 + Brakelight_2;
-//        imshow("Brakelight", Brakelight_merge);
+        //        imshow("Brakelight", Brakelight_merge);
         
         int count_left_red = 0;
-        for(i=red_x1; i<=red_x2; i++){
-            for(j=red_y1; j<=red_y2; j++){
+        for(i=x1; i<=x2; i++){
+            for(j=y1; j<=y2; j++){
                 if(Brakelight_merge.at<uchar>(j,i) == 255)
                     count_left_red++;
             }
         }
         
         int count_right_red = 0;
-        for(i=red_x3; i<=red_x4; i++){
-            for(j=red_y1; j<=red_y2; j++){
+        for(i=x3; i<=x4; i++){
+            for(j=y1; j<=y2; j++){
                 if(Brakelight_merge.at<uchar>(j,i) == 255)
                     count_right_red++;
             }
@@ -289,22 +307,17 @@ public:
         //cout << count_left_red << "   " << count_right_red << endl;
         
         if(count_left_red > 20 && count_right_red > 20 && count_left_red + count_right_red > 40){
-            putText(car, "Warning!", Point( red_x1, red_y2 - 3 ), FONT_HERSHEY_COMPLEX_SMALL, 0.5, Scalar(0,0,0) );
-            putText(car, "Warning!", Point( red_x3, red_y2 - 3 ), FONT_HERSHEY_COMPLEX_SMALL, 0.5, Scalar(0,0,0) );
+            putText(car, "Warning!", Point( x1, y2 - 3 ), FONT_HERSHEY_COMPLEX_SMALL, 0.5, Scalar(0,0,0) );
+            putText(car, "Warning!", Point( x3, y2 - 3 ), FONT_HERSHEY_COMPLEX_SMALL, 0.5, Scalar(0,0,0) );
         }
-        
-        // 將車燈的邊線畫出
-        DrawLightLine(car, red_x1, red_x2, red_x3, red_x4, red_y1, red_y2);
-        
-        // 將車子的邊線畫出
-        DrawCarLine(src, car, left_boundary, min_point * 0.4, right_boundary, min_point, initial_x, initial_y);
+
     }
     
-    void Detect_Yellow( Mat car, Mat hsv, int x1, int x2, int y1, int y2, int Car_Num )
+    void Detect_Yellow( Mat car, int x1, int x2, int y1, int y2, int Car_Num )
     {
-        Mat Yellow;
+        /*Mat Yellow;
         inRange(hsv, Scalar(18,50,50), Scalar(38,255,255), Yellow);
-//        imshow("Yellow", Yellow);
+        imshow("Yellow", Yellow);
         int cnt = 0;
         for ( int y=y1*0.8; y<=y2*1.2; y++ ){
             for ( int x=x1*0.8; x<=x2*1.2; x++ ){
@@ -312,10 +325,11 @@ public:
                     cnt++ ;
                 }
             }
-        }
-        Mat Yellow_Light;
+        }*/
+        Mat hsv, Yellow_Light;
+        cvtColor(car, hsv, CV_BGR2HSV);
         inRange(hsv, Scalar(20,50,220), Scalar(34,255,255), Yellow_Light);
-//        imshow("Yellow_Light", Yellow_Light);
+        imshow("Yellow_Light", Yellow_Light);
         
         int count = 0;
         for ( int y=y1*0.8; y<=y2*1.2; y++ ){
@@ -325,11 +339,11 @@ public:
                 }
             }
         }
-        
-        if(count > 20){
-            
+        if( abs(count - carDetectStruct[Car_Num].yellow) > 20){
+            carDetectStruct[Car_Num].turn_signal_flag = 0;
+            carDetectStruct[Car_Num].yellow = count;
+            //putText(car, "turn signal", Point(0,0), FONT_HERSHEY_COMPLEX_SMALL, 0.7, Scalar(0,255,255));
         }
-        
     }
 
     
@@ -348,14 +362,16 @@ public:
         pt2.x += initial_x; pt2.y += 650 + initial_y; pt4.x += initial_x; pt4.y += 650 + initial_y;
         
         bool match = false;
+        int num = 99;
         for(i = 0; i < 10; i++){
-            if((abs(carDetectStruct[i].l.x - pt2.x) < 20 && abs(carDetectStruct[i].l.y - pt2.y) < 20) && carDetectStruct[i].flag != 99){
+            if((abs(carDetectStruct[i].l.x - pt2.x) < 40 && abs(carDetectStruct[i].l.y - pt2.y) < 40) && carDetectStruct[i].flag != 99){
                 carDetectStruct[i].l.x = pt2.x;
                 carDetectStruct[i].l.y = pt2.y;
                 carDetectStruct[i].r.x = pt4.x;
                 carDetectStruct[i].r.y = pt4.y;
                 carDetectStruct[i].flag = 0;
                 match = true;
+                num = i;
                 break;
             }
         }
@@ -367,17 +383,16 @@ public:
                     carDetectStruct[i].r.x = pt4.x;
                     carDetectStruct[i].r.y = pt4.y;
                     carDetectStruct[i].flag = 0;
+                    carDetectStruct[i].turn_signal_flag = 99;
                     break;
                 }
             }
         }
         
+        // 偵測黃色
+        Detect_Yellow(car_frame, x1, x2, y1, y2, i);
 
-        
-        
-        
-        
-        
+
     }
     
     void DrawLightLine(Mat car_frame, int x1, int x2, int x3, int x4, int y1, int y2){
@@ -390,8 +405,6 @@ public:
         rectangle(car_frame, pt1, pt2, Scalar(255,0,0));
         rectangle(car_frame, pt3, pt4, Scalar(255,0,0));
     }
-    
-    
     
     
     

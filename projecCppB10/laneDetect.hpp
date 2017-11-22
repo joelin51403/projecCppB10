@@ -14,6 +14,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include <stdio.h>
 #include <iostream>
+#include <string>
 #include <math.h>
 #include "car.hpp"
 #include "global_variable.h"
@@ -27,20 +28,20 @@ public:
     Point test1, test2;
     Point pt1,pt2;
     //Lane();
-    Lane(Mat fram, Car car){
+    Lane(Mat fram, Car car[]){
         //laneDetectDrawtest(fram);
         laneDetectDraw(fram, car);
     }
     
-    void laneDetectDraw(Mat src, Car car){
+    void laneDetectDraw(Mat src, Car car[]){
         //Point lastPtL1,lastPtL2,lastPtR1, lastPtR2;
-        car.carRoiTransLane();
+        
         Mat dst, cdst;
         float rhoRange = 50,thetaRange = 0.2;
         bool ifRightLine = 0, ifLeftLine = 0;
         CvRect Rect1=cvRect(roiLane[0],roiLane[1],roiLane[2],roiLane[3]);
         src = src(Rect1);
-        
+
         Canny(src, dst, 50, 200, 3);
         cvtColor(dst, cdst, CV_GRAY2BGR);
 
@@ -93,24 +94,57 @@ public:
         }
 
         //line(src, car.r, car.l,  Scalar(0,0,255), 3, CV_AA);//測試的線
-        if(laneDetectLineL(car.l, car.r)){
-            int flag = 1;
-//            cout<<"L: "<< flag <<" ";
-            crossLaneL ++;
-        }
-        else{
-            crossLaneL = 0;
-        }
-        
-        if(laneDetectLineR(car.l, car.r)){
-            int flag = 1;
-//            cout<<"R: "<< flag << endl;
-            crossLaneR ++;
-        }
-        else{
-            crossLaneR = 0;
+        for(int i = 0; i < 10; i++){
+            car[i].carRoiTransLane();
+            char str[10];
+            
+
+            sprintf(str, "%d", i);
+
+            putText(src, str , (car[i].l + car[i].r)/2,  FONT_HERSHEY_COMPLEX , 1,Scalar(0,255,0));
+
+//            if(car[i].croosLaneNumL > 3 || car[i].croosLaneNumR >3){
+//                putText(src, "change" , (car[i].l + car[i].r)/2,  FONT_HERSHEY_COMPLEX , 1,Scalar(0,255,0));
+//
+//                
+//            }
+            if((car[i].croosLaneNumL > 3 || car[i].croosLaneNumR >3 )&& car[i].turn_signal_flag > 10){
+                putText(src, "illegal" , (car[i].l + car[i].r)/2,  FONT_HERSHEY_COMPLEX , 1,Scalar(0,255,0));
+                
+            }
+            
+            if(laneDetectLineL(car[i].l, car[i].r)){
+                
+                int flag = 1;
+                //            cout<<"L: "<< flag <<" ";
+                car[i].croosLaneNumL++;
+//                crossLine++;
+                
+            }
+            else{
+                car[i].croosLaneNumL = 0;
+//                crossLine = 0;
+            }
+            
+            if(laneDetectLineR(car[i].l, car[i].r)){
+                int flag = 1;
+                //            cout<<"R: "<< flag << endl;
+                car[i].croosLaneNumR++;
+//                crossLine++;
+            }
+            else{
+                car[i].croosLaneNumR = 0;
+//                crossLine = 0;
+            }
+            car[i].carRoiTransLaneRe();
         }
 
+        for(int i = 0; i < 10; i++){
+            cout<<i<<".l: "<<car[i].l<<" croosLaneNum: "<<car[i].croosLaneNumL<<endl;
+            
+        
+        
+        }
 
         //car.carRoiTransLaneRe();
         //imshow("1123", dst);

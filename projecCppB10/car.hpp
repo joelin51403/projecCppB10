@@ -35,6 +35,11 @@ public:
         distanceCar();
         
     }
+    
+    void carSetValue(int flag){
+        turn_signal_flag = flag;
+    }
+    
     void carRoiTransLane(){
         r.x -= 300;
         r.y -= 780;
@@ -43,9 +48,9 @@ public:
     }
     void carRoiTransLaneRe(){
         r.x += 300;
-        r.y += 650;
+        r.y += 780;
         l.x += 300;
-        l.y += 650;
+        l.y += 780;
     }
     
     void distanceCar(){
@@ -81,14 +86,18 @@ public:
         }
         
     }
-    int flag = 5;
+    //int flag = 5;
     Point r, l;
+    int Yellow = 0;
+    
     
     double meterCar, temp, tempY;
     char meterCarString[20];
     Point distance[5];
     Point distanceR[5];
     double distanceNum[5] = { 300, 240, 200, 180 };
+    int turn_signal_flag = 99;
+    int croosLaneNumR = 0,croosLaneNumL = 0;
 
 
 };
