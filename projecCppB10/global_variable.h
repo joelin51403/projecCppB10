@@ -37,4 +37,8 @@ struct carStruct{
     int yellow = 0;
 };
 carStruct carDetectStruct[10];
+
+
+Point lanePt[4];
+
 #endif /* global_variable_h */

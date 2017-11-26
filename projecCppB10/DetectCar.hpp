@@ -332,18 +332,20 @@ public:
         imshow("Yellow_Light", Yellow_Light);
         
         int count = 0;
-        for ( int y=y1*0.8; y<=y2*1.2; y++ ){
+        for ( int y=y1; y<=y2; y++ ){
             for ( int x=x1*0.8; x<=x2*1.2; x++ ){
                 if( Yellow_Light.at<uchar>(y,x) == 255){
                     count++ ;
                 }
             }
         }
+        cout << count << endl;
         if( abs(count - carDetectStruct[Car_Num].yellow) > 20){
             carDetectStruct[Car_Num].turn_signal_flag = 0;
             carDetectStruct[Car_Num].yellow = count;
             //putText(car, "turn signal", Point(0,0), FONT_HERSHEY_COMPLEX_SMALL, 0.7, Scalar(0,255,255));
         }
+        
     }
 
     
@@ -363,6 +365,9 @@ public:
         
         bool match = false;
         int num = 99;
+        char str[10];
+        
+       
         for(i = 0; i < 10; i++){
             if((abs(carDetectStruct[i].l.x - pt2.x) < 40 && abs(carDetectStruct[i].l.y - pt2.y) < 40) && carDetectStruct[i].flag != 99){
                 carDetectStruct[i].l.x = pt2.x;
@@ -372,6 +377,11 @@ public:
                 carDetectStruct[i].flag = 0;
                 match = true;
                 num = i;
+                
+                sprintf(str, "%d", i);
+                
+                //putText(car_frame, str , (carDetectStruct[i].l + carDetectStruct[i].r)/2,  FONT_HERSHEY_COMPLEX , 1,Scalar(0,255,0));//lane detect number
+                putText(car_frame, str , Point((pt2.x+pt4.x)/2-initial_x, (pt2.y+pt4.y)/2-initial_y-650),  FONT_HERSHEY_COMPLEX , 1,Scalar(0,255,0));//lane detect number
                 break;
             }
         }

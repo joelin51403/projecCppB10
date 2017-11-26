@@ -88,6 +88,7 @@ public:
     }
     //int flag = 5;
     Point r, l;
+    Point rUp, lUp;
     int Yellow = 0;
     
     
@@ -98,8 +99,8 @@ public:
     double distanceNum[5] = { 300, 240, 200, 180 };
     int turn_signal_flag = 99;
     int croosLaneNumR = 0,croosLaneNumL = 0;
-
-
+    bool illegal = 0, crossLine = 0,noLight = 0;
+    int crossLineNum = 7;
 };
 
 #endif /* car_hpp */

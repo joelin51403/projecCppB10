@@ -16,7 +16,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     int i;
-    string v1 = "/Volumes/Sony_64GU/原始影片/65測試2.mp4";//路徑
+    string v1 = "/Users/joelin/Documents/專題B10/vedio/65測試2.mp4";//路徑
     string v2 = "/Volumes/Joe_大usb16G/IMG_0135.MOV";//路徑
     VideoCapture video(v1);
     double vidoeFramNum = video.get(CV_CAP_PROP_FRAME_COUNT);
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
         //imshow("show2", src);
 
         Lane *detect = new Lane(src,car);
-        //writer.write(src);
+        writer.write(src);
        // imshow("show2", src);
 
         resize(src, src, Size(src.cols/2, src.rows/2));
@@ -77,8 +77,6 @@ int main(int argc, char *argv[])
             }
             framCountRtio += vidoeFramNum/100;
         }
-        
-        
     }
     cout<<"100%"<<endl<<"DONE!!";
     return 0;
