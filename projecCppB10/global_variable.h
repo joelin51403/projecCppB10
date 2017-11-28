@@ -20,11 +20,10 @@ static int ifLeftLineNum, ifRightLineNum;
 
 int orignal[99]={};
 int yellow[99]={};
-
 int recordnum = 0;
 int crossLine = 0;
-//int crossLaneR = 0, crossLaneL = 0;
 int rConti = 0, lConti = 0;
+
 String car_cascade_name = "/Users/joelin/Documents/專題B10/cascade_all_fix_w80_h80_pos405_neg769.xml";
 CascadeClassifier car_cascade;
 
@@ -37,8 +36,6 @@ struct carStruct{
     int yellow = 0;
 };
 carStruct carDetectStruct[10];
-
-
 Point lanePt[4];
 
 #endif /* global_variable_h */

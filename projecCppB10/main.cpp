@@ -24,9 +24,7 @@ int main(int argc, char *argv[])
     double framCountRtio = vidoeFramNum/100, currentFram = 0;
     Mat src;
     Point l,r;
-    //Size videoSize = Size((int)video.get(CV_CAP_PROP_FRAME_WIDTH),(int)video.get(CV_CAP_PROP_FRAME_HEIGHT));
     Size videoSize = Size(1920,1080);
-
     VideoWriter writer;
     //writer.open("/Users/joelin/Documents/專題B10/vedio/VideoTest.avi", CV_FOURCC('M', 'J', 'P', 'G'), 30, videoSize);
     writer.open("/Users/joelin/Documents/專題B10/vedio/VideoTest1122.avi", CV_FOURCC('M', 'J', 'P', 'G'), 30, videoSize);
@@ -39,27 +37,15 @@ int main(int argc, char *argv[])
             break;
         }
         resize(src, src, Size(1920,1080));
-        
+
         detectCar *detectCar1 = new detectCar(src, recordnum);
         
         for(i = 0; i < 10; i++){
-            //if(carDetectStruct[i].flag){
-                car[i].carSetPoint(carDetectStruct[i].l, carDetectStruct[i].r);
-                
-                //line(src, car[i].l, car[i].r, Scalar(0,0,255));
-//                cout<<car[i].l<<" "<<car[i].r<<endl;
-                
-            //}
+                car[i].carSetPoint(carDetectStruct[i].l, carDetectStruct[i].r, carDetectStruct[i].turn_signal_flag);
         }
         
-        for(i = 0; i < 10; i++){
-            car[i].carSetValue(carDetectStruct[i].turn_signal_flag);
-        }
-        //imshow("show2", src);
-
         Lane *detect = new Lane(src,car);
         writer.write(src);
-       // imshow("show2", src);
 
         resize(src, src, Size(src.cols/2, src.rows/2));
         imshow("show", src);

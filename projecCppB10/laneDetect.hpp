@@ -29,25 +29,22 @@ public:
     Point lanePtL1, lanePtR1, lanePtL2, lanePtR2;
     Point test1, test2;
     Point pt1,pt2;
-    //Lane();
     Lane(Mat fram, Car car[]){
-        //laneDetectDrawtest(fram);
         laneDetectDraw(fram, car);
     }
     
     void laneDetectDraw(Mat src, Car car[]){
-        //Point lastPtL1,lastPtL2,lastPtR1, lastPtR2;
         vector<Vec2f> lines;
         vector<Point> laneVec,laneVec2;
         Mat dst, cdst;
         float rhoRange = 50,thetaRange = 0.2;
         bool ifRightLine = 0, ifLeftLine = 0;
-        
+
         CvRect Rect1=cvRect(roiLane[0],roiLane[1],roiLane[2],roiLane[3]);
         src = src(Rect1);
-        
+
         Canny(src, dst, 50, 200, 3);
-        cvtColor(dst, cdst, CV_GRAY2BGR);
+        imshow("1",dst);
 
         
         HoughLines(dst, lines, 1, CV_PI/180, 80, 0, 0 );
@@ -61,27 +58,25 @@ public:
             pt1.y = cvRound(y0 + 1000*(a));
             pt2.x = cvRound(x0 - 1000*(-b));
             pt2.y = cvRound(y0 - 1000*(a));
+
             if((rho > 240 - rhoRange) && (rho < 240 + rhoRange) && (theta > 0.95 - thetaRange) && (theta < 0.95 + thetaRange) && ifLeftLine != 1)//left line get
             {
-//                line( src, pt1, pt2, Scalar(0,0,255), 3, CV_AA);
+//                line( src2, pt1, pt2, Scalar(0,0,255), 3, CV_AA);
                 ifLeftLine = 1;
                 lanePtL1.x = pt1.x; lanePtL1.y = pt1.y;
                 lanePtL2.x = pt2.x; lanePtL2.y = pt2.y;
                 lastPtL1 = pt1; lastPtL2 = pt2;
-                
-                
                 lanePt[0].x = pt1.x;
                 lanePt[0].y = pt1.y;
                 lanePt[1].x = pt2.x;
                 lanePt[1].y = pt2.y;
                 laneVec.push_back(pt1);
                 laneVec.push_back(pt2);
-
                 ifLeftLineNum = 0;
             }
             if((rho > -250 - rhoRange) && (rho < -250 + rhoRange) && (theta > 2.0- thetaRange) && (theta < 2.0 + thetaRange) && ifRightLine != 1)//right line get
             {
-//                line( src, pt1, pt2, Scalar(0,0,255), 3, CV_AA);
+//                line( src2, pt1, pt2, Scalar(0,0,255), 3, CV_AA);
                 ifRightLine = 1;
                 lanePtR1 = pt1; lanePtR2 = pt2;
                 lastPtR1 = pt1; lastPtR2 = pt2;
@@ -91,33 +86,24 @@ public:
                 lanePt[3].y = pt2.y;
                 laneVec.push_back(pt1);
                 laneVec.push_back(pt2);
-
-
                 ifRightLineNum = 0;
             }
             if(ifLeftLine == 1 && ifRightLine == 1){//both get
                 break;
             }
-
         }
         if(ifLeftLine == 0 && ifLeftLineNum < 30){//no left line
-//            line( src, lastPtL1, lastPtL2, Scalar(0,0,255), 3, CV_AA);
             lanePtL1 = lastPtL1; lanePtL2 = lastPtL2;
-
             lanePt[0].x = lastPtL1.x;
             lanePt[0].y = lastPtL1.y;
             lanePt[1].x = lastPtL2.x;
             lanePt[1].y = lastPtL2.y;
             laneVec.push_back(lastPtL1);
             laneVec.push_back(lastPtL2);
-
             ifLeftLineNum++;
-            
         }
         if(ifRightLine == 0 && ifRightLineNum < 30){//no right line
-//            line( src, lastPtR1, lastPtR2, Scalar(0,0,255), 3, CV_AA);
             lanePtR1 = lastPtR1; lanePtR2 = lastPtR2;
-
             lanePt[2].x = lastPtR1.x;
             lanePt[2].y = lastPtR1.y;
             lanePt[3].x = lastPtR2.x;
@@ -127,7 +113,6 @@ public:
 
             ifRightLineNum++;
         }
-//        Mat mask(src.rows,src.cols,CV_8UC3, Scalar(0,0,0));
         Mat mask = src.clone();
         if (parallel(lanePt[0],lanePt[1],lanePt[2],lanePt[3])||!intersect_in(lanePt[0],lanePt[1],lanePt[2],lanePt[3])){
             fillConvexPoly(mask,laneVec,Scalar(0,200,0));
@@ -151,37 +136,31 @@ public:
         //line(src, car.r, car.l,  Scalar(0,0,255), 3, CV_AA);//測試的線
         for(int i = 0; i < 10; i++){
             car[i].carRoiTransLane();
+            //if illegal
             if((car[i].croosLaneNumL > 5 || car[i].croosLaneNumR > 5)){
-                
                 car[i].crossLine = 1;
             }
             else if(car[i].crossLineNum != 0){
                 car[i].crossLineNum--;
             }
-
             if( car[i].turn_signal_flag > 50){
                 car[i].noLight = 1;
             }
-            
-            
             if(car[i].crossLine == 1 && car[i].noLight == 1){
                 car[i].illegal = 1;
             }
-                                                         
             if(car[i].illegal == 1){
                 putText(src, "illegal" , (car[i].l + car[i].r)/2,  FONT_HERSHEY_COMPLEX , 1.5,Scalar(0,0,255));
-                
             }
-            
+            // reset
             if(car[i].crossLineNum == 0){
                 car[i].illegal = 0;
                 car[i].noLight = 0;
                 car[i].crossLine = 0;
                 car[i].crossLineNum = 7;
             }
-
+            // if cross line
             if(laneDetectLineL(car[i].l, car[i].r)){
-                int flag = 1;
                 car[i].croosLaneNumL++;
             }
             else{
@@ -189,19 +168,15 @@ public:
             }
             
             if(laneDetectLineR(car[i].l, car[i].r)){
-                int flag = 1;
                 car[i].croosLaneNumR++;
             }
             else{
                 car[i].croosLaneNumR = 0;
             }
+            
             car[i].carRoiTransLaneRe();
+            
         }
-
-
-        //car.carRoiTransLaneRe();
-        //imshow("1123", dst);
-
         
     }
 
@@ -305,9 +280,7 @@ public:
         float pre = (x1*y2 - y1*x2), post = (x3*y4 - y3*x4);
         float x = ( pre * (x3 - x4) - (x1 - x2) * post ) / d;
         float y = ( pre * (y3 - y4) - (y1 - y2) * post ) / d;
-        
         // Check if the x and y coordinates are within both lines
-        
         // Return the point of intersection
         Point* ret = new Point();
         ret->x = x;
