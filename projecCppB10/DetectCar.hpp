@@ -28,17 +28,21 @@ public:
         frameROI = frameROI(ROI);
         DetectAndDisplay( frameROI, recordnum );
         for(int i = 0; i < 10; i++){
-            if(carDetectStruct[i].flag != 99){
+            if(carDetectStruct[i].flag != 9999){
                 carDetectStruct[i].flag++;
                 carDetectStruct[i].turn_signal_flag++;
             }
-            if (carDetectStruct[i].flag >6 && carDetectStruct[i].flag != 99) {
-                carDetectStruct[i].flag = 99;
-                carDetectStruct[i].turn_signal_flag = 99;
+            if (carDetectStruct[i].flag >6 && carDetectStruct[i].flag != 9999) {
+                carDetectStruct[i].flag = 9999;
+                carDetectStruct[i].turn_signal_flag = 120;
                 carDetectStruct[i].r.x = 0;
                 carDetectStruct[i].r.y = 0;
                 carDetectStruct[i].l.x = 0;
                 carDetectStruct[i].l.y = 0;
+                carDetectStruct[i].lUp.x = 0;
+                carDetectStruct[i].lUp.y = 0;
+                carDetectStruct[i].rUp.x = 0;
+                carDetectStruct[i].rUp.y = 0;
             }
         }
         
@@ -57,7 +61,7 @@ public:
         detect_start = clock();
         
         // Detect cars
-        car_cascade.detectMultiScale( frame_gray, car, 1.1, 30, 0|CV_HAAR_SCALE_IMAGE, Size(0,0) );
+        car_cascade.detectMultiScale( frame_gray, car, 1.1, 30, 0|CV_HAAR_SCALE_IMAGE, Size(1,30) );
         // 結束偵測車子的時間
         detect_end = clock();
         
@@ -270,7 +274,7 @@ public:
         DrawLightLine(car, red_x1, red_x2, red_x3, red_x4, red_y1, red_y2);
         
         // 將車子的邊線畫出
-        DrawCarLine(src, car, left_boundary, min_point * 0.4, right_boundary, min_point, initial_x, initial_y);
+        MatchCar(src, car, left_boundary, min_point * 0.4, right_boundary, min_point, initial_x, initial_y, red_y1, red_y2);
         
         
         Brake_light(car, hsv, red_x1, red_x2, red_x3, red_x4, red_y1, red_y2);
@@ -332,14 +336,14 @@ public:
         imshow("Yellow_Light", Yellow_Light);
         
         int count = 0;
-        for ( int y=y1; y<=y2; y++ ){
+        for ( int y=y1*0.8; y<=y2*0.8; y++ ){
             for ( int x=x1*0.8; x<=x2*1.2; x++ ){
                 if( Yellow_Light.at<uchar>(y,x) == 255){
                     count++ ;
                 }
             }
         }
-        cout << count << endl;
+//        cout << count << endl;
         if( abs(count - carDetectStruct[Car_Num].yellow) > 20){
             carDetectStruct[Car_Num].turn_signal_flag = 0;
             carDetectStruct[Car_Num].yellow = count;
@@ -349,7 +353,7 @@ public:
     }
 
     
-    void DrawCarLine(Mat src, Mat car_frame, int x1, int y1, int x2, int y2, int initial_x, int initial_y)
+    void MatchCar(Mat src, Mat car_frame, int x1, int y1, int x2, int y2, int initial_x, int initial_y, int red_y1, int red_y2)
     {
         int i;
         Point pt1(x1, y1);
@@ -357,16 +361,12 @@ public:
         Point pt3(x2, y1);
         Point pt4(x2, y2);
         
-        line(car_frame, pt1, pt2, Scalar(0,0,255));
-        line(car_frame, pt3, pt4, Scalar(0,0,255));
-        line(car_frame, pt2, pt4, Scalar(0,0,255), 3, CV_AA);
-        
         pt2.x += initial_x; pt2.y += 650 + initial_y; pt4.x += initial_x; pt4.y += 650 + initial_y;
+        pt1.x += initial_x; pt1.y += 650 + initial_y; pt3.x += initial_x; pt3.y += 650 + initial_y;
         
         bool match = false;
         int num = 99;
         char str[10];
-        
        
         for(i = 0; i < 10; i++){
             if((abs(carDetectStruct[i].l.x - pt2.x) < 40 && abs(carDetectStruct[i].l.y - pt2.y) < 40) && carDetectStruct[i].flag != 99){
@@ -374,6 +374,10 @@ public:
                 carDetectStruct[i].l.y = pt2.y;
                 carDetectStruct[i].r.x = pt4.x;
                 carDetectStruct[i].r.y = pt4.y;
+                carDetectStruct[i].lUp.x = pt1.x;
+                carDetectStruct[i].lUp.y = pt1.y;
+                carDetectStruct[i].rUp.x = pt3.x;
+                carDetectStruct[i].rUp.y = pt3.y;
                 carDetectStruct[i].flag = 0;
                 match = true;
                 num = i;
@@ -387,20 +391,24 @@ public:
         }
         if(match == false){
             for(i = 0; i < 10; i++){
-                if(carDetectStruct[i].flag == 99){
+                if(carDetectStruct[i].flag == 9999){
                     carDetectStruct[i].l.x = pt2.x;
                     carDetectStruct[i].l.y = pt2.y;
                     carDetectStruct[i].r.x = pt4.x;
                     carDetectStruct[i].r.y = pt4.y;
+                    carDetectStruct[i].lUp.x = pt1.x;
+                    carDetectStruct[i].lUp.y = pt1.y;
+                    carDetectStruct[i].rUp.x = pt3.x;
+                    carDetectStruct[i].rUp.y = pt3.y;
                     carDetectStruct[i].flag = 0;
-                    carDetectStruct[i].turn_signal_flag = 99;
+                    carDetectStruct[i].turn_signal_flag = 120;
                     break;
                 }
             }
         }
         
         // 偵測黃色
-        Detect_Yellow(car_frame, x1, x2, y1, y2, i);
+        Detect_Yellow(car_frame, x1, x2, red_y1, red_y2, i);
 
 
     }

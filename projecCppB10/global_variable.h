@@ -31,7 +31,7 @@ int roiCar[4] = {0,650,1920,300};
 int roiLane[4] = {300,780,1000,169};
 struct carStruct{
     int flag = 99;
-    Point r, l;
+    Point r, l, lUp, rUp;
     int turn_signal_flag = 99;
     int yellow = 0;
 };

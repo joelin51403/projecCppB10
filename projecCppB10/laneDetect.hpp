@@ -143,7 +143,7 @@ public:
             else if(car[i].crossLineNum != 0){
                 car[i].crossLineNum--;
             }
-            if( car[i].turn_signal_flag > 50){
+            if( car[i].turn_signal_flag > 120){
                 car[i].noLight = 1;
             }
             if(car[i].crossLine == 1 && car[i].noLight == 1){

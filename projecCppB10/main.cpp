@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     Size videoSize = Size(1920,1080);
     VideoWriter writer;
     //writer.open("/Users/joelin/Documents/專題B10/vedio/VideoTest.avi", CV_FOURCC('M', 'J', 'P', 'G'), 30, videoSize);
-    writer.open("/Users/joelin/Documents/專題B10/vedio/VideoTest1122.avi", CV_FOURCC('M', 'J', 'P', 'G'), 30, videoSize);
+    //writer.open("/Users/joelin/Documents/專題B10/vedio/65測試2_輸出結果2.avi", CV_FOURCC('M', 'J', 'P', 'G'), 30, videoSize);
     cout<<"START !!"<<endl;
     Car car[10];
     while(true){
@@ -41,10 +41,15 @@ int main(int argc, char *argv[])
         detectCar *detectCar1 = new detectCar(src, recordnum);
         
         for(i = 0; i < 10; i++){
-                car[i].carSetPoint(carDetectStruct[i].l, carDetectStruct[i].r, carDetectStruct[i].turn_signal_flag);
+            car[i].carSetPoint(carDetectStruct[i].l, carDetectStruct[i].r, carDetectStruct[i].lUp, carDetectStruct[i].rUp, carDetectStruct[i].turn_signal_flag, carDetectStruct[i].flag);
         }
         
         Lane *detect = new Lane(src,car);
+        
+        for(i = 0; i < 10; i++){
+            car[i].drawcarline(src);
+        }
+        
         writer.write(src);
 
         resize(src, src, Size(src.cols/2, src.rows/2));

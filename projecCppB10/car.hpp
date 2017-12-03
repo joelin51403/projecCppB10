@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string>
 using namespace cv;
+using namespace std;
 class Car{
 public:
     Car(){}
@@ -21,16 +22,25 @@ public:
         r.y = R.y;
         l.x = L.x;
         l.y = L.y;
+        lUp.x = lUp.x;
+        lUp.y = lUp.y;
+        rUp.x = rUp.x;
+        rUp.y = rUp.y;
         temp = double(r.y);
         distanceCar();
     }
     
-    void carSetPoint(Point L, Point R, int flag){
+    void carSetPoint(Point L, Point R, Point LUp, Point RUp, int car_turn_signal_flag, int car_flag){
         r.x = R.x;
         r.y = R.y;
         l.x = L.x;
         l.y = L.y;
-        turn_signal_flag = flag;
+        lUp.x = LUp.x;
+        lUp.y = LUp.y;
+        rUp.x = RUp.x;
+        rUp.y = RUp.y;
+        turn_signal_flag = car_turn_signal_flag;
+        flag = car_flag;
         temp = double(r.y);
         distanceCar();
     }
@@ -81,12 +91,36 @@ public:
         
     }
     
+    void drawcarline(Mat src){
+        if(flag != 9999){
+            if(illegal)
+                isillegal(src);
+            else
+                notillegal(src);
+        }
+    }
+    
+    void isillegal(Mat src){
+        line( src, l, r, Scalar(0,0,255), 3, CV_AA);
+        cout << rUp << endl;
+        line( src, l, lUp, Scalar(0,0,255), 2);
+        line( src, r, rUp, Scalar(0,0,255), 2);
+    }
+    
+    void notillegal(Mat src){
+        line( src, l, r, Scalar(0,255,0), 3, CV_AA);
+        cout << rUp << endl;
+        line( src, l, lUp, Scalar(0,255,0), 2);
+        line( src, r, rUp, Scalar(0,255,0), 2);
+    }
+    
     Point r, l;
     Point rUp, lUp;
     Point distance[5];
     Point distanceR[5];
     int Yellow = 0;
-    int turn_signal_flag = 99;
+    int turn_signal_flag = 120;
+    int flag = 9999;
     int croosLaneNumR = 0,croosLaneNumL = 0;
     int crossLineNum = 7;
     double meterCar, temp, tempY;
