@@ -43,6 +43,14 @@ public:
                 carDetectStruct[i].lUp.y = 0;
                 carDetectStruct[i].rUp.x = 0;
                 carDetectStruct[i].rUp.y = 0;
+                carDetectStruct[i].Leftlight1.x = 0;
+                carDetectStruct[i].Leftlight1.y = 0;
+                carDetectStruct[i].Leftlight2.x = 0;
+                carDetectStruct[i].Leftlight2.y = 0;
+                carDetectStruct[i].Rightlight1.x = 0;
+                carDetectStruct[i].Rightlight1.y = 0;
+                carDetectStruct[i].Rightlight2.x = 0;
+                carDetectStruct[i].Rightlight2.y = 0;
             }
         }
         
@@ -156,8 +164,8 @@ public:
         Mat Red1, Red2, Red_merge;
         
         // 紅色的h為156~10，因為程式限制所以要分兩個偵測並二值化，再合併
-        inRange(hsv, Scalar(0,100,100), Scalar(10,255,255), Red1);
-        inRange(hsv, Scalar(156,100,100), Scalar(180,255,255), Red2);
+        inRange(hsv, Scalar(0,70,70), Scalar(10,255,255), Red1);
+        inRange(hsv, Scalar(156,70,70), Scalar(180,255,255), Red2);
         
         // 合併兩個不同區間的紅色
         Red_merge = Red1 + Red2;
@@ -267,14 +275,8 @@ public:
             right_boundary = red_x4 + 1;
         }
         
-        
-        
-        
-        // 將車燈的邊線畫出
-        DrawLightLine(car, red_x1, red_x2, red_x3, red_x4, red_y1, red_y2);
-        
         // 將車子的邊線畫出
-        MatchCar(src, car, left_boundary, min_point * 0.4, right_boundary, min_point, initial_x, initial_y, red_y1, red_y2);
+        MatchCar(src, car, left_boundary, min_point * 0.13, right_boundary, min_point, initial_x, initial_y, red_x1, red_x2, red_x3, red_x4, red_y1, red_y2);
         
         
         Brake_light(car, hsv, red_x1, red_x2, red_x3, red_x4, red_y1, red_y2);
@@ -293,16 +295,16 @@ public:
         //        imshow("Brakelight", Brakelight_merge);
         
         int count_left_red = 0;
-        for(i=x1; i<=x2; i++){
-            for(j=y1; j<=y2; j++){
+        for(i=x1-5; i<=x2+5; i++){
+            for(j=y1-5; j<=y2+5; j++){
                 if(Brakelight_merge.at<uchar>(j,i) == 255)
                     count_left_red++;
             }
         }
         
         int count_right_red = 0;
-        for(i=x3; i<=x4; i++){
-            for(j=y1; j<=y2; j++){
+        for(i=x3-5; i<=x4+5; i++){
+            for(j=y1-5; j<=y2+5; j++){
                 if(Brakelight_merge.at<uchar>(j,i) == 255)
                     count_right_red++;
             }
@@ -317,7 +319,7 @@ public:
 
     }
     
-    void Detect_Yellow( Mat car, int x1, int x2, int y1, int y2, int Car_Num )
+    void Detect_Yellow( Mat car, int x1, int x2, int x3, int x4, int y1, int y2, int Car_Num )
     {
         /*Mat Yellow;
         inRange(hsv, Scalar(18,50,50), Scalar(38,255,255), Yellow);
@@ -336,24 +338,41 @@ public:
         imshow("Yellow_Light", Yellow_Light);
         
         int count = 0;
-        for ( int y=y1*0.8; y<=y2*0.8; y++ ){
-            for ( int x=x1*0.8; x<=x2*1.2; x++ ){
+        for ( int y=y1; y<=y2; y++ ){
+            for ( int x=x1; x<=x2; x++ ){
                 if( Yellow_Light.at<uchar>(y,x) == 255){
                     count++ ;
                 }
             }
         }
-//        cout << count << endl;
-        if( abs(count - carDetectStruct[Car_Num].yellow) > 20){
+        
+        if( abs(count - carDetectStruct[Car_Num].leftYellow) > 20){
             carDetectStruct[Car_Num].turn_signal_flag = 0;
-            carDetectStruct[Car_Num].yellow = count;
-            //putText(car, "turn signal", Point(0,0), FONT_HERSHEY_COMPLEX_SMALL, 0.7, Scalar(0,255,255));
+            carDetectStruct[Car_Num].leftYellow = count;
+            carDetectStruct[Car_Num].leftSignal = 1;
         }
+        
+        count = 0;
+        for ( int y=y1; y<=y2; y++ ){
+            for ( int x=x3; x<=x4; x++ ){
+                if( Yellow_Light.at<uchar>(y,x) == 255){
+                    count++ ;
+                }
+            }
+        }
+        
+        if( abs(count - carDetectStruct[Car_Num].rightYellow) > 20){
+            carDetectStruct[Car_Num].turn_signal_flag = 0;
+            carDetectStruct[Car_Num].rightYellow = count;
+            carDetectStruct[Car_Num].rightSignal = 1;
+        }
+        
+        cout << count << endl;
         
     }
 
     
-    void MatchCar(Mat src, Mat car_frame, int x1, int y1, int x2, int y2, int initial_x, int initial_y, int red_y1, int red_y2)
+    void MatchCar(Mat src, Mat car_frame, int x1, int y1, int x2, int y2, int initial_x, int initial_y, int red_x1, int red_x2, int red_x3, int red_x4, int red_y1, int red_y2)
     {
         int i;
         Point pt1(x1, y1);
@@ -363,6 +382,12 @@ public:
         
         pt2.x += initial_x; pt2.y += 650 + initial_y; pt4.x += initial_x; pt4.y += 650 + initial_y;
         pt1.x += initial_x; pt1.y += 650 + initial_y; pt3.x += initial_x; pt3.y += 650 + initial_y;
+        red_x1 += initial_x;
+        red_x2 += initial_x;
+        red_x3 += initial_x;
+        red_x4 += initial_x;
+        red_y1 += initial_y + 650;
+        red_y2 += initial_y + 650;
         
         bool match = false;
         int num = 99;
@@ -378,6 +403,14 @@ public:
                 carDetectStruct[i].lUp.y = pt1.y;
                 carDetectStruct[i].rUp.x = pt3.x;
                 carDetectStruct[i].rUp.y = pt3.y;
+                carDetectStruct[i].Leftlight1.x = red_x1;
+                carDetectStruct[i].Leftlight1.y = red_y1;
+                carDetectStruct[i].Leftlight2.x = red_x2;
+                carDetectStruct[i].Leftlight2.y = red_y2;
+                carDetectStruct[i].Rightlight1.x = red_x3;
+                carDetectStruct[i].Rightlight1.y = red_y1;
+                carDetectStruct[i].Rightlight2.x = red_x4;
+                carDetectStruct[i].Rightlight2.y = red_y2;
                 carDetectStruct[i].flag = 0;
                 match = true;
                 num = i;
@@ -400,6 +433,14 @@ public:
                     carDetectStruct[i].lUp.y = pt1.y;
                     carDetectStruct[i].rUp.x = pt3.x;
                     carDetectStruct[i].rUp.y = pt3.y;
+                    carDetectStruct[i].Leftlight1.x = red_x1;
+                    carDetectStruct[i].Leftlight1.y = red_y1;
+                    carDetectStruct[i].Leftlight2.x = red_x2;
+                    carDetectStruct[i].Leftlight2.y = red_y2;
+                    carDetectStruct[i].Rightlight1.x = red_x3;
+                    carDetectStruct[i].Rightlight1.y = red_y1;
+                    carDetectStruct[i].Rightlight2.x = red_x4;
+                    carDetectStruct[i].Rightlight2.y = red_y2;
                     carDetectStruct[i].flag = 0;
                     carDetectStruct[i].turn_signal_flag = 120;
                     break;
@@ -407,24 +448,17 @@ public:
             }
         }
         
+        red_x1 -= initial_x;
+        red_x2 -= initial_x;
+        red_x3 -= initial_x;
+        red_x4 -= initial_x;
+        red_y1 -= initial_y + 650;
+        red_y2 -= initial_y + 650;
+        
         // 偵測黃色
-        Detect_Yellow(car_frame, x1, x2, red_y1, red_y2, i);
-
+        Detect_Yellow(car_frame, red_x1, red_x2, red_x3, red_x4, red_y1, red_y2, i);
 
     }
-    
-    void DrawLightLine(Mat car_frame, int x1, int x2, int x3, int x4, int y1, int y2){
-        
-        Point pt1(x1, y1);
-        Point pt2(x2, y2);
-        Point pt3(x3, y1);
-        Point pt4(x4, y2);
-        
-        rectangle(car_frame, pt1, pt2, Scalar(255,0,0));
-        rectangle(car_frame, pt3, pt4, Scalar(255,0,0));
-    }
-    
-    
     
 };
 #endif /* DetectCar_hpp */

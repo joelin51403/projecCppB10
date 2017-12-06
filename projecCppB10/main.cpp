@@ -41,13 +41,14 @@ int main(int argc, char *argv[])
         detectCar *detectCar1 = new detectCar(src, recordnum);
         
         for(i = 0; i < 10; i++){
-            car[i].carSetPoint(carDetectStruct[i].l, carDetectStruct[i].r, carDetectStruct[i].lUp, carDetectStruct[i].rUp, carDetectStruct[i].turn_signal_flag, carDetectStruct[i].flag);
+            car[i].carSetPoint(carDetectStruct[i].l, carDetectStruct[i].r, carDetectStruct[i].lUp, carDetectStruct[i].rUp, carDetectStruct[i].Leftlight1, carDetectStruct[i].Leftlight2,  carDetectStruct[i].Rightlight1, carDetectStruct[i].Rightlight2, carDetectStruct[i].turn_signal_flag, carDetectStruct[i].flag, carDetectStruct[i].leftSignal, carDetectStruct[i].rightSignal);
         }
         
         Lane *detect = new Lane(src,car);
         
         for(i = 0; i < 10; i++){
-            car[i].drawcarline(src);
+            car[i].drawCarLine(src);
+            putText(src, car[i].meterCarString,Point( (car[i].r.x + car[i].l.x)/2-15 ,(car[i].l.y + car[i].l.y)/2+28)  , FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255, 255));
         }
         
         writer.write(src);

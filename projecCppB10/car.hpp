@@ -26,11 +26,12 @@ public:
         lUp.y = lUp.y;
         rUp.x = rUp.x;
         rUp.y = rUp.y;
+        
         temp = double(r.y);
         distanceCar();
     }
     
-    void carSetPoint(Point L, Point R, Point LUp, Point RUp, int car_turn_signal_flag, int car_flag){
+    void carSetPoint(Point L, Point R, Point LUp, Point RUp, Point Lturnlight1, Point Lturnlight2, Point Rturnlight1, Point Rturnlight2, int car_turn_signal_flag, int car_flag, int leftSignal, int rightSignal){
         r.x = R.x;
         r.y = R.y;
         l.x = L.x;
@@ -39,6 +40,17 @@ public:
         lUp.y = LUp.y;
         rUp.x = RUp.x;
         rUp.y = RUp.y;
+        lturn1.x = Lturnlight1.x;
+        lturn1.y = Lturnlight1.y;
+        lturn2.x = Lturnlight2.x;
+        lturn2.y = Lturnlight2.y;
+        rturn1.x = Rturnlight1.x;
+        rturn1.y = Rturnlight1.y;
+        rturn2.x = Rturnlight2.x;
+        rturn2.y = Rturnlight2.y;
+        
+        leftSignalflag = leftSignal;
+        rightSignalflag = rightSignal;
         turn_signal_flag = car_turn_signal_flag;
         flag = car_flag;
         temp = double(r.y);
@@ -91,34 +103,60 @@ public:
         
     }
     
-    void drawcarline(Mat src){
+    void drawCarLine(Mat src){
         if(flag != 9999){
-            if(illegal)
-                isillegal(src);
-            else
-                notillegal(src);
+            if(illegal){
+                isIllegal(src);
+            }
+            else{
+                notIllegal(src);
+            }
+            drawLightLine(src);
+        }
+        
+        if(turn_signal_flag <= 10){
+            if(leftSignalflag == 1)
+                leftTurnLight(src);
+            if(rightSignalflag == 1)
+                rightTurnLight(src);
         }
     }
     
-    void isillegal(Mat src){
+    void isIllegal(Mat src){
         line( src, l, r, Scalar(0,0,255), 3, CV_AA);
-        cout << rUp << endl;
         line( src, l, lUp, Scalar(0,0,255), 2);
         line( src, r, rUp, Scalar(0,0,255), 2);
+        line( src, lUp, rUp, Scalar(0,0,255), 2);
     }
     
-    void notillegal(Mat src){
-        line( src, l, r, Scalar(0,255,0), 3, CV_AA);
-        cout << rUp << endl;
-        line( src, l, lUp, Scalar(0,255,0), 2);
-        line( src, r, rUp, Scalar(0,255,0), 2);
+    void notIllegal(Mat src){
+        line( src, l, r, Scalar(255,0,0), 3, CV_AA);
+        line( src, l, lUp, Scalar(255,0,0), 2);
+        line( src, r, rUp, Scalar(255,0,0), 2);
+        line( src, lUp, rUp, Scalar(255,0,0), 2);
     }
     
-    Point r, l;
-    Point rUp, lUp;
+    void drawLightLine(Mat src){
+        rectangle(src, lturn1, lturn2, Scalar(100,100,200), 2);
+        rectangle(src, rturn1, rturn2, Scalar(100,100,200), 2);
+    }
+    
+    void leftTurnLight(Mat src){
+        putText(src, "Left turn signal", lUp, FONT_HERSHEY_COMPLEX_SMALL, 1.3, Scalar(0,255,255), 4);
+        rectangle(src, lturn1, lturn2, Scalar(0,255,255), 3);
+    }
+    
+    void rightTurnLight(Mat src){
+        putText(src, "Right turn signal", lUp, FONT_HERSHEY_COMPLEX_SMALL, 1.3, Scalar(0,255,255), 4);
+        rectangle(src, rturn1, rturn2, Scalar(0,255,255), 3);
+    }
+    
+    Point r, l, rUp, lUp;
+    Point lturn1, lturn2, rturn1, rturn2;
     Point distance[5];
     Point distanceR[5];
-    int Yellow = 0;
+    int leftSignalflag = 0, rightSignalflag = 0;
+    //int Yellow = 0;
     int turn_signal_flag = 120;
     int flag = 9999;
     int croosLaneNumR = 0,croosLaneNumL = 0;

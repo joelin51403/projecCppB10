@@ -150,7 +150,7 @@ public:
                 car[i].illegal = 1;
             }
             if(car[i].illegal == 1){
-                putText(src, "illegal" , (car[i].l + car[i].r)/2,  FONT_HERSHEY_COMPLEX , 1.5,Scalar(0,0,255));
+                putText(src, "Illegal" , Point( (car[i].r.x + car[i].l.x)/2-60 ,(car[i].l.y + car[i].l.y)/2-45),  FONT_HERSHEY_COMPLEX , 1.2,Scalar(0,0,255));
             }
             // reset
             if(car[i].crossLineNum == 0){
