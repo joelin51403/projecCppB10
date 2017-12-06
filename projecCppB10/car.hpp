@@ -26,9 +26,7 @@ public:
         lUp.y = lUp.y;
         rUp.x = rUp.x;
         rUp.y = rUp.y;
-        
         temp = double(r.y);
-        distanceCar();
     }
     
     void carSetPoint(Point L, Point R, Point LUp, Point RUp, Point Lturnlight1, Point Lturnlight2, Point Rturnlight1, Point Rturnlight2, int car_turn_signal_flag, int car_flag, int leftSignal, int rightSignal){
@@ -54,7 +52,6 @@ public:
         turn_signal_flag = car_turn_signal_flag;
         flag = car_flag;
         temp = double(r.y);
-        distanceCar();
     }
     
     void carSetValue(int flag){
@@ -74,7 +71,7 @@ public:
         l.y += 780;
     }
     
-    void distanceCar(){
+    void distanceCar(Mat src){
         temp-=650;
         distance[0].x = 0; distance[0].y =300;// 10m
         distanceR[0].x = 1920; distanceR[0].y = 300;
@@ -84,7 +81,6 @@ public:
         distanceR[2].x = 1920; distanceR[2].y = 200;
         distance[3].x = 0; distance[3].y = 180;//40m
         distanceR[3].x = 1920; distanceR[3].y = 180;
-        
         if (temp <= distance[0].y && temp > distance[1].y) {
             meterCar = 10.0 + ((distanceNum[0] - temp) / (distanceNum[0] - distanceNum[1])) * 10.0;
             sprintf(meterCarString, "%.1f", meterCar);
@@ -98,13 +94,14 @@ public:
             sprintf(meterCarString, "%.1f", meterCar);
         }
         else{
-            strcpy(meterCarString, "far");
+            strcpy(meterCarString, " ");
         }
+        putText(src, meterCarString,Point( (r.x + l.x)/2-15 ,(l.y + l.y)/2+28)  , FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255, 255));
         
     }
     
     void drawCarLine(Mat src){
-        if(flag != 9999){
+        if( flag != 9999 && !(l.y == lUp.y || r.y == rUp.y || lUp.x == rUp.x || lUp.y == 0 || rUp.y == 0) ){
             if(illegal){
                 isIllegal(src);
             }
@@ -112,9 +109,10 @@ public:
                 notIllegal(src);
             }
             drawLightLine(src);
+            distanceCar(src);
         }
         
-        if(turn_signal_flag <= 10){
+        if(turn_signal_flag <= 15){
             if(leftSignalflag == 1)
                 leftTurnLight(src);
             if(rightSignalflag == 1)
@@ -142,12 +140,12 @@ public:
     }
     
     void leftTurnLight(Mat src){
-        putText(src, "Left turn signal", lUp, FONT_HERSHEY_COMPLEX_SMALL, 1.3, Scalar(0,255,255), 4);
+        putText(src, "Left Turn Signal", Point(lUp.x,lUp.y-20), FONT_HERSHEY_COMPLEX_SMALL, 1.3, Scalar(0,255,255), 4);
         rectangle(src, lturn1, lturn2, Scalar(0,255,255), 3);
     }
     
     void rightTurnLight(Mat src){
-        putText(src, "Right turn signal", lUp, FONT_HERSHEY_COMPLEX_SMALL, 1.3, Scalar(0,255,255), 4);
+        putText(src, "Right Turn Signal", Point(lUp.x,lUp.y-20), FONT_HERSHEY_COMPLEX_SMALL, 1.3, Scalar(0,255,255), 4);
         rectangle(src, rturn1, rturn2, Scalar(0,255,255), 3);
     }
     

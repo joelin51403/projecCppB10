@@ -367,7 +367,12 @@ public:
             carDetectStruct[Car_Num].rightSignal = 1;
         }
         
-        cout << count << endl;
+        if(carDetectStruct[Car_Num].rightSignal == 1 && carDetectStruct[Car_Num].leftSignal == 1){
+            carDetectStruct[Car_Num].rightSignal = 0;
+            carDetectStruct[Car_Num].leftSignal = 0;
+        }
+        
+        //cout << count << endl;
         
     }
 
@@ -415,10 +420,10 @@ public:
                 match = true;
                 num = i;
                 
-                sprintf(str, "%d", i);
+                sprintf(str, "%d", i+1);
                 
                 //putText(car_frame, str , (carDetectStruct[i].l + carDetectStruct[i].r)/2,  FONT_HERSHEY_COMPLEX , 1,Scalar(0,255,0));//lane detect number
-                putText(car_frame, str , Point((pt2.x+pt4.x)/2-initial_x, (pt2.y+pt4.y)/2-initial_y-650),  FONT_HERSHEY_COMPLEX , 1,Scalar(0,255,0));//lane detect number
+                putText(car_frame, str , Point((pt2.x+pt4.x)/2-initial_x-7, (pt2.y+pt4.y)/2-initial_y-650-10),  FONT_HERSHEY_COMPLEX , 1,Scalar(0,255,0));//lane detect number
                 break;
             }
         }

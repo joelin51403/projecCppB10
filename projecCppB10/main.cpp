@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     Point l,r;
     Size videoSize = Size(1920,1080);
     VideoWriter writer;
-    //writer.open("/Users/joelin/Documents/專題B10/vedio/VideoTest.avi", CV_FOURCC('M', 'J', 'P', 'G'), 30, videoSize);
+    writer.open("/Users/joelin/Documents/專題B10/output/VideoTest.avi", CV_FOURCC('M', 'J', 'P', 'G'), 30, videoSize);
     //writer.open("/Users/joelin/Documents/專題B10/vedio/65測試2_輸出結果2.avi", CV_FOURCC('M', 'J', 'P', 'G'), 30, videoSize);
     cout<<"START !!"<<endl;
     Car car[10];
@@ -48,14 +48,13 @@ int main(int argc, char *argv[])
         
         for(i = 0; i < 10; i++){
             car[i].drawCarLine(src);
-            putText(src, car[i].meterCarString,Point( (car[i].r.x + car[i].l.x)/2-15 ,(car[i].l.y + car[i].l.y)/2+28)  , FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255, 255));
         }
         
         writer.write(src);
 
-        resize(src, src, Size(src.cols/2, src.rows/2));
-        imshow("show", src);
-        waitKey(1);
+//        resize(src, src, Size(src.cols/2, src.rows/2));
+//        imshow("show", src);
+//        waitKey(1);
         
         //計算進度條
         if(currentFram > framCountRtio ){
